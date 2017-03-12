@@ -23,11 +23,11 @@ BEGIN:
           MOV DS,AX
 
           LEA DX,MSG
-          MOV AH,09H	;msg ekrana yaz
+          MOV AH,09H	
           INT 21H
 
           LEA SI,STR1
-          MOV AH,01H	;ekrandan oku
+          MOV AH,01H	
 		  
 READ:
           INT 21H
@@ -36,26 +36,26 @@ READ:
           CMP AL,0DH
           JE  DISPLAY
 		  
-		  CMP AL,'a'
-		  JL CONVERT2
+	  CMP AL,'a'
+	  JL CONVERT2
 		
-		  CMP AL,'Z'
-		  JG CONVERT
+	  CMP AL,'Z'
+	  JG CONVERT
 
 CONVERT2:
 		  
           MOV [SI],AL
           INC SI
 		  
-		  CMP BL,0DH
+	  CMP BL,0DH
           JMP READ
 		  
 CONVERT:
-		  SUB AL,20H
+	  SUB AL,20H
           MOV [SI],AL
           INC SI
 		  
-		  CMP BL,0DH
+	  CMP BL,0DH
           JMP READ
   
 DISPLAY:
