@@ -1,0 +1,19 @@
+NUTS MACRO
+LIST_ORG DW PIS
+PIS DW HAZ
+DB 'Pistachios : A native of Syria$'
+HAZ DW PEC
+DB 'Hazels : A native of Europe and south west Asia$'
+PEC DW MAC
+DB 'Pecans : A native of North America$'
+MAC DW PEA
+DB 'Macadamia Nuts : A native of North East Australia$'
+PEA DW CAS
+DB 'Peanuts : A native of South America$'
+CAS DW PIN
+DB 'Cashews : A native of South and Central America$'
+PIN DW ALM
+DB 'Pine Nuts : A native of the easternMediterranean region$ '
+ALM DW 0
+DB 'Almonds : A native of the eastern Mediterranean region$'
+ENDM 
