@@ -1,0 +1,188 @@
+package ege.mevzubahis.Fragments;
+
+import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.net.Uri;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+
+import org.w3c.dom.Text;
+
+import java.util.ArrayList;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import ege.mevzubahis.R;
+
+import static com.facebook.FacebookSdk.getApplicationContext;
+
+/**
+ * A simple {@link Fragment} subclass.
+ * Activities that contain this fragment must implement the
+ * {@link OnFragmentInteractionListener} interface
+ * to handle interaction events.
+ * Use the {@link HomeFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+public class HomeFragment extends Fragment {
+  // TODO: Rename parameter arguments, choose names that match
+  // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+  private static final String ARG_PARAM1 = "param1";
+  private static final String ARG_PARAM2 = "param2";
+
+
+  // TODO: Rename and change types of parameters
+  private String mParam1;
+  private String mParam2;
+  SharedPreferences sharedPreferences;
+  String senderID;
+
+  private OnFragmentInteractionListener mListener;
+
+  public HomeFragment() {
+    // Required empty public constructor
+  }
+
+
+  /**
+   * Use this factory method to create a new instance of
+   * this fragment using the provided parameters.
+   *
+   * @param param1 Parameter 1.
+   * @param param2 Parameter 2.
+   * @return A new instance of fragment HomeFragment.
+   */
+  // TODO: Rename and change types and number of parameters
+  public static HomeFragment newInstance(String param1, String param2) {
+    HomeFragment fragment = new HomeFragment();
+    Bundle args = new Bundle();
+    args.putString(ARG_PARAM1, param1);
+    args.putString(ARG_PARAM2, param2);
+    fragment.setArguments(args);
+    return fragment;
+  }
+
+  @Override
+  public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+    senderID=sharedPreferences.getString("userIDKey",null);
+    if (getArguments() != null) {
+      mParam1 = getArguments().getString(ARG_PARAM1);
+      mParam2 = getArguments().getString(ARG_PARAM2);
+    }
+
+
+  }
+
+  @Override
+  public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                           Bundle savedInstanceState) {
+    // Inflate the layout for this fragment
+    View rootView = inflater.inflate(R.layout.fragment_home, container, false);
+    final ListView fragmentBetsListview;
+    final ArrayList<String> betsList = new ArrayList<>();
+    final ArrayAdapter arrayAdapter;
+
+    fragmentBetsListview = (ListView) rootView.findViewById(R.id.betList);
+
+    arrayAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, betsList) {
+      @Override
+      public View getView(int position, View convertView, ViewGroup parent) {
+        View view = super.getView(position, convertView, parent);
+
+        TextView textView = (TextView) view.findViewById(android.R.id.text1);
+        textView.setTextColor(Color.BLACK);
+
+        return view;
+      }
+    };
+
+    fragmentBetsListview.setAdapter(arrayAdapter);
+
+    final FirebaseDatabase database = FirebaseDatabase.getInstance();
+    final DatabaseReference reference = database.getReference();
+    Query myQuery= reference.child("Deals").orderByChild("matchName");
+
+    myQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+      @Override
+      public void onDataChange(DataSnapshot dataSnapshot) {
+        for (DataSnapshot child : dataSnapshot.getChildren()) {
+          Log.e("childSENDER",child.child("sender").getValue().toString());
+          if(child.child("sender").getValue().toString()==senderID) {
+            String betsItem = String.valueOf(child.child("matchName").getValue());
+            Log.e("SportActivity", betsItem);
+            betsList.add(betsItem);
+            arrayAdapter.notifyDataSetChanged();
+          }
+        }
+      }
+
+      @Override
+      public void onCancelled(DatabaseError databaseError) {
+
+      }
+    });
+
+    ButterKnife.bind(this, rootView);
+    return rootView;
+
+
+  }
+
+  // TODO: Rename method, update argument and hook method into UI event
+  public void onButtonPressed(Uri uri) {
+    if (mListener != null) {
+      mListener.onFragmentInteraction(uri);
+    }
+  }
+
+ /* @Override public void onAttach(Context context) {
+    super.onAttach(context);
+    if (context instanceof OnFragmentInteractionListener) {
+      mListener = (OnFragmentInteractionListener) context;
+    } else {
+      throw new RuntimeException(context.toString() + " must implement OnFragmentInteractionListener");
+    }
+  }*/
+
+  @Override public void onDetach() {
+    super.onDetach();
+    mListener = null;
+  }
+
+
+
+  /**
+   * This interface must be implemented by activities that contain this
+   * fragment to allow an interaction in this fragment to be communicated
+   * to the activity and potentially other fragments contained in that
+   * activity.
+   * <p>
+   * See the Android Training lesson <a href=
+   * "http://developer.android.com/training/basics/fragments/communicating.html"
+   * >Communicating with Other Fragments</a> for more information.
+   */
+  public interface OnFragmentInteractionListener {
+    // TODO: Update argument type and name
+    void onFragmentInteraction(Uri uri);
+  }
+}
